@@ -1,0 +1,10 @@
+<?php
+
+namespace Foo;
+
+use SomeNamespace\SomeExistingTrait;
+
+class BarBar
+{
+    use SomeExistingTrait;
+}

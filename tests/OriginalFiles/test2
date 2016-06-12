@@ -1,0 +1,9 @@
+<?php
+
+namespace Foo;
+
+use Qux\Qax;
+
+class Bar
+{
+}

@@ -1,0 +1,29 @@
+{
+  "name": "kkszymanowski/traitor",
+  "description": "Add a trait use to existing PHP class",
+  "keywords": ["PHP", "trait"],
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/kkszymanowski/traitor/issues",
+    "source": "https://github.com/kkszymanowski/traitor"
+  },
+  "authors": [
+    {
+      "name": "Kuba Szymanowski",
+      "email": "kuba.szymanowski@inf24.pl"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.9",
+    "nikic/php-parser": "^2.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Traitor\\": "src/"
+    }
+  },
+  "minimum-stability": "dev"
+}

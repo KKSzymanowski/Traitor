@@ -1,0 +1,10 @@
+<?php
+
+namespace Foo;
+
+use Qux\Qax;
+use Baz\FooTrait;
+
+class Bar {
+    use FooTrait;
+}

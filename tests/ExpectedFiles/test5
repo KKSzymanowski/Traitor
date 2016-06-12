@@ -1,0 +1,11 @@
+<?php
+
+namespace Foo;
+
+use Baz\FooTrait;
+
+class Bar
+{
+    use FooTrait;
+
+}

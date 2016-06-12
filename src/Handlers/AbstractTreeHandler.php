@@ -1,0 +1,321 @@
+<?php
+
+namespace Traitor\Handlers;
+
+use Exception;
+use PhpParser\Error;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\ParserFactory;
+
+class AbstractTreeHandler implements Handler
+{
+
+    /** @var  array */
+    protected $content;
+
+    /** @var  string */
+    protected $trait;
+
+    /** @var  string */
+    protected $traitShortName;
+
+    /** @var  string */
+    protected $class;
+
+    /** @var  string */
+    protected $classShortName;
+
+    /** @var  array */
+    protected $syntaxTree;
+
+    /** @var  Namespace_ */
+    protected $namespace;
+
+    /** @var  array */
+    protected $importStatements;
+
+    /** @var  array */
+    protected $classes;
+
+    /** @var  Class_ */
+    protected $classAbstractTree;
+
+    /**
+     * @param array $content
+     * @param string $trait
+     * @param string $class
+     */
+    public function __construct($content, $trait, $class)
+    {
+        $this->content = $content;
+
+        $this->trait = $trait;
+        $this->traitShortName = array_pop(explode('\\', $trait));
+
+        $this->class = $class;
+        $this->classShortName = array_pop(explode('\\', $class));
+
+    }
+
+    /**
+     * @return string
+     */
+    public function handle()
+    {
+        $this->buildSyntaxTree()
+             ->addTraitImport()
+             ->buildSyntaxTree()
+             ->addTraitUseStatement();
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function toString()
+    {
+        return implode($this->content);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @return $this
+     * @throws Exception
+     */
+    protected function buildSyntaxTree()
+    {
+        $this->parseContent()
+             ->retrieveNamespace()
+             ->retrieveImports()
+             ->retrieveClasses()
+             ->findClassDefinition();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addTraitImport()
+    {
+        if ($this->hasTraitImport()) {
+            return $this;
+        }
+
+        $lastImport = $this->getLastImport();
+        if ($lastImport === false) {
+            $lineNumber = $this->classAbstractTree->getLine() - 1;
+            $newImport = "use " . $this->trait . ";\r\n\r\n";
+        } else {
+            $lineNumber = $this->getLastImport()->getAttribute('endLine');
+            $newImport = "use " . $this->trait . ";\r\n";
+        }
+
+        array_splice($this->content, $lineNumber, 0, $newImport);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function addTraitUseStatement()
+    {
+
+        if ($this->alreadyUsesTrait()) {
+            return $this;
+        }
+
+        $line = $this->getFirstTraitUseLine();
+
+        /*
+         * If class definition is like this:
+         *
+         * class Foo
+         * {
+         *     // Content
+         * }
+         *
+         * not like this:
+         *
+         * class Foo {
+         *     // Content
+         * }
+         *
+         * we need to add the use statement one line further
+         */
+        if (strpos($this->content[$this->classAbstractTree->getLine() - 1], '{') === false) {
+            $line++;
+        }
+
+        $newTraitUse = static::getIndentation($this->content[$line]) . "use " . $this->traitShortName . ";\r\n";
+
+        array_splice($this->content, $line, 0, $newTraitUse);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws Exception
+     */
+    protected function parseContent()
+    {
+        $flatContent = implode('', $this->content);
+
+        try {
+            $this->syntaxTree = (new ParserFactory)
+                ->create(ParserFactory::PREFER_PHP7)
+                ->parse($flatContent);
+        } catch (Error $e) {
+            throw new Exception('Error on parsing ' . $this->classShortName . " class\n" . $e->getMessage());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws Exception
+     */
+    protected function retrieveNamespace()
+    {
+        if (!isset($this->syntaxTree[0]) || !($this->syntaxTree[0] instanceof Namespace_)) {
+            throw new Exception("Could not locate namespace definition in ' . $this->classShortName . ' class");
+        }
+
+        $this->namespace = $this->syntaxTree[0];
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function retrieveImports()
+    {
+        $this->importStatements = array_filter($this->namespace->stmts, function ($statement) {
+            return $statement instanceof Use_;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function retrieveClasses()
+    {
+        $this->classes = array_filter($this->namespace->stmts, function ($statement) {
+            return $statement instanceof Class_;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return \PhpParser\Node\Stmt\Use_
+     */
+    protected function getLastImport()
+    {
+        return end($this->importStatements);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasTraitImport()
+    {
+        foreach ($this->importStatements as $statement) {
+            if ($statement->uses[0]->name->toString() == $this->trait) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function alreadyUsesTrait()
+    {
+        $traitUses = array_filter($this->classAbstractTree->stmts, function ($statement) {
+            return $statement instanceof TraitUse;
+        });
+
+        /** @var TraitUse $statement */
+        foreach ($traitUses as $statement) {
+
+            foreach($statement->traits as $traitUse)
+            {
+                if ($traitUse->toString() == $this->trait
+                    || $traitUse->toString() == $this->traitShortName) {
+                    return true;
+                }
+            }
+
+
+        }
+
+        return false;
+    }
+
+    /**
+     * @return $this
+     * @throws Exception
+     */
+    protected function findClassDefinition()
+    {
+        foreach ($this->classes as $class) {
+            if ($class->name == $this->classShortName) {
+                $this->classAbstractTree = $class;
+
+                return $this;
+            }
+        }
+
+        throw new Exception("Class " . $this->classShortName . " not found");
+    }
+
+    /**
+     * @return \PhpParser\Node\Stmt\TraitUse
+     */
+    protected function getFirstTraitUseLine()
+    {
+        if (count($this->classAbstractTree->stmts) == 0) {
+            return $this->classAbstractTree->getLine();
+        }
+
+        return array_values($this->classAbstractTree->stmts)[0]->getLine() - 1;
+    }
+
+    /**
+     * @param $line
+     * @return string
+     */
+    protected static function getIndentation($line)
+    {
+        preg_match('/^\s*/', $line, $match);
+
+        if (isset($match[0])) {
+            $match[0] = trim($match[0], "\n\r");
+
+            if (strlen($match[0]) > 0)
+                return $match[0];
+        }
+
+        return '    ';
+    }
+}
