@@ -41,8 +41,9 @@ class TraitUseAdder
 
         $handler = new AbstractTreeHandler(
             $this->content,
-            $this->classReflection->getName(),
-            $this->traitReflection->getName());
+            $this->traitReflection->getName(),
+            $this->classReflection->getName()
+        );
 
         $this->content = $handler->handle()->toArray();
 

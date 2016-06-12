@@ -53,10 +53,12 @@ class AbstractTreeHandler implements Handler
         $this->content = $content;
 
         $this->trait = $trait;
-        $this->traitShortName = array_pop(explode('\\', $trait));
+        $traitParts = explode('\\', $trait);
+        $this->traitShortName = array_pop($traitParts);
 
         $this->class = $class;
-        $this->classShortName = array_pop(explode('\\', $class));
+        $classParts = explode('\\', $class);
+        $this->classShortName = array_pop($classParts);
 
     }
 
