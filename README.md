@@ -11,7 +11,19 @@ composer require kkszymanowski/traitor
 ## Usage
 - Basic usage:
 ```
-(new TraitUseAdder)->add(FooTrait::class)->to(BarClass:class);
+use Traitor\Traitor;
+
+Traitor::addTrait(FooTrait::class)->toClass(FooClass:class);
+```
+- Add multiple traits:
+```
+use Traitor\Traitor;
+
+Traitor::addTraits([
+    FooTrait::class,
+    BarTrait::class,
+    BazTrait::class
+])->toClass(FooClass:class);
 ```
 - Only generate output without changing files:
 ```
