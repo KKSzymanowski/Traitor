@@ -1,11 +1,12 @@
 {
   "name": "kkszymanowski/traitor",
   "description": "Add a trait use to existing PHP class",
-  "keywords": ["PHP", "trait"],
+  "keywords": ["PHP", "trait", "add"],
   "license": "MIT",
   "support": {
     "issues": "https://github.com/kkszymanowski/traitor/issues",
-    "source": "https://github.com/kkszymanowski/traitor"
+    "source": "https://github.com/kkszymanowski/traitor",
+    "email": "kuba.szymanowski@inf24.pl"
   },
   "authors": [
     {

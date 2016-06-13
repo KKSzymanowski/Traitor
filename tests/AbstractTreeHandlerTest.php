@@ -3,7 +3,7 @@
 use Traitor\Foo;
 use Traitor\Handlers\AbstractTreeHandler;
 
-class TraitorTest extends PHPUnit_Framework_TestCase
+class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
 {
 
     public function test_normal_behavior()
@@ -29,6 +29,8 @@ class TraitorTest extends PHPUnit_Framework_TestCase
         }
 
     }
+
+    
 
     public function test_exception_is_thrown_when_class_is_not_found()
     {
