@@ -118,7 +118,9 @@ class AbstractTreeHandler implements Handler
         $lastImport = $this->getLastImport();
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
-            $newImport = "use " . $this->trait . ";\r\n\r\n";
+            $newImport = "use " . $this->trait . ";\r\n";
+
+            array_splice($this->content, $lineNumber, 0, "\r\n");
         } else {
             $lineNumber = $this->getLastImport()->getAttribute('endLine');
             $newImport = "use " . $this->trait . ";\r\n";
