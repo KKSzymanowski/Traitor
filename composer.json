@@ -24,6 +24,5 @@
     "psr-4": {
       "Traitor\\": "src/"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }
