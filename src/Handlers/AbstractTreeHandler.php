@@ -63,7 +63,7 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @return string
+     * @return $this
      */
     public function handle()
     {
@@ -295,7 +295,7 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @return \PhpParser\Node\Stmt\TraitUse
+     * @return int
      */
     protected function getFirstTraitUseLine()
     {
