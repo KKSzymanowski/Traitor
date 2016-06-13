@@ -1,6 +1,5 @@
 <?php
 
-use Traitor\MyFacade;
 use Traitor\Traitor;
 use Traitor\TraitUseAdder;
 
@@ -32,7 +31,7 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
         include __DIR__ . '/TestingClasses/'. $file;
     }
 
-    public function test()
+    public function test_normal_behavior()
     {
 
         $this->copy('BarClass.stub', 'BarClass.php');
@@ -43,7 +42,7 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
         $this->includeFile('BarClass.php');
 
         $adder = Traitor::addTraits(['Trait1', 'Some\Long\Trait3\Name\Space\Trait3']);
-        $adder = $adder->addTrait('Trait2Namespace\Trait2')->toClass(\Baz\BarClass::class);
+        $adder->addTrait('Trait2Namespace\Trait2')->toClass(\Baz\BarClass::class);
 
         $this->copy('BarClass.php', 'NewBarClass.php');
 
@@ -59,6 +58,48 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
 
         unlink(__DIR__ . '/TestingClasses/NewBarClass.php');
 
+        $this->copy('BarClass.stub', 'BarClass.php');
+
+    }
+
+    public function test_normal_behavior_reverse_order()
+    {
+
+        $this->copy('BarClass.stub', 'BarClass.php');
+
+        $this->includeFile('Trait1.php');
+        $this->includeFile('Trait2.php');
+        $this->includeFile('Trait3.php');
+        $this->includeFile('BarClass.php');
+
+        $adder = Traitor::addTrait('Trait2Namespace\Trait2');
+        $adder->addTraits(['Trait1', 'Some\Long\Trait3\Name\Space\Trait3'])->toClass(\Baz\BarClass::class);
+
+        $this->copy('BarClass.php', 'NewBarClass.php');
+
+        $this->replaceInFile("BarClass", "NewBarClass", "NewBarClass.php");
+
+        $this->includeFile('NewBarClass.php');
+
+        $classUses = class_uses('\Baz\NewBarClass');
+
+        $this->assertArrayHasKey('Trait1', $classUses);
+        $this->assertArrayHasKey('Trait2Namespace\Trait2', $classUses);
+        $this->assertArrayHasKey('Some\Long\Trait3\Name\Space\Trait3', $classUses);
+
+        unlink(__DIR__ . '/TestingClasses/NewBarClass.php');
+
+        $this->copy('BarClass.stub', 'BarClass.php');
+
+    }
+
+    public function test_exception_is_thrown_when_trying_to_call_toClass_before_calling_addTrait()
+    {
+        $this->includeFile('BarClass.php');
+
+        $this->setExpectedException(BadMethodCallException::class);
+
+        (new TraitUseAdder())->toClass('\Baz\BarClass');
     }
 
 }
