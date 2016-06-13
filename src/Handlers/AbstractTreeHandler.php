@@ -174,7 +174,8 @@ class AbstractTreeHandler implements Handler
      */
     protected function parseContent()
     {
-        $flatContent = implode('', $this->content);
+        $flatContent = implode($this->content);
+
 
         try {
             $this->syntaxTree = (new ParserFactory)
