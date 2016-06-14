@@ -4,5 +4,4 @@ namespace Baz;
 
 class BarClass
 {
-
 }
