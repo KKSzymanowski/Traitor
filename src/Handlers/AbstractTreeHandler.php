@@ -4,11 +4,12 @@ namespace Traitor\Handlers;
 
 use Exception;
 use PhpParser\Error;
+use PhpParser\Lexer;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
-use PhpParser\ParserFactory;
+use PhpParser\Parser;
 
 class AbstractTreeHandler implements Handler
 {
@@ -163,9 +164,8 @@ class AbstractTreeHandler implements Handler
         $flatContent = implode($this->content);
 
         try {
-            $this->syntaxTree = (new ParserFactory())
-                ->create(ParserFactory::PREFER_PHP7)
-                ->parse($flatContent);
+            $parser = new Parser(new Lexer);
+            $this->syntaxTree = $parser->parse($flatContent);
         } catch (Error $e) {
             throw new Exception('Error on parsing '.$this->classShortName." class\n".$e->getMessage());
         }
