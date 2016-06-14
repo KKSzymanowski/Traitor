@@ -1,5 +1,8 @@
 composer.lock
 vendor/
+.php_cs.cache
+
+# --- PHPStorm ---
 
 # User-specific stuff:
 .idea/workspace.xml

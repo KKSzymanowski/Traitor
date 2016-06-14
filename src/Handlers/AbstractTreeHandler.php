@@ -117,12 +117,12 @@ class AbstractTreeHandler implements Handler
         $lastImport = $this->getLastImport();
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
-            $newImport = 'use '.$this->trait.";\r\n";
+            $newImport = 'use '.$this->trait.";\n";
 
-            array_splice($this->content, $lineNumber, 0, "\r\n");
+            array_splice($this->content, $lineNumber, 0, "\n");
         } else {
             $lineNumber = $this->getLastImport()->getAttribute('endLine');
-            $newImport = 'use '.$this->trait.";\r\n";
+            $newImport = 'use '.$this->trait.";\n";
         }
 
         array_splice($this->content, $lineNumber, 0, $newImport);
@@ -158,10 +158,10 @@ class AbstractTreeHandler implements Handler
          * we need to add the use statement one line further
          */
         if (strpos($this->content[$this->classAbstractTree->getLine() - 1], '{') === false) {
-            $line++;
+            ++$line;
         }
 
-        $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.";\r\n";
+        $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.";\n";
 
         array_splice($this->content, $line, 0, $newTraitUse);
 
@@ -176,7 +176,6 @@ class AbstractTreeHandler implements Handler
     protected function parseContent()
     {
         $flatContent = implode($this->content);
-
 
         try {
             $this->syntaxTree = (new ParserFactory())
