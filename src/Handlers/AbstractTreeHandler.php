@@ -10,7 +10,6 @@ use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
 
 class AbstractTreeHandler implements Handler
 {
