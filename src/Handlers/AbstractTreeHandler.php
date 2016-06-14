@@ -197,7 +197,7 @@ class AbstractTreeHandler implements Handler
     protected function retrieveNamespace()
     {
         if (!isset($this->syntaxTree[0]) || !($this->syntaxTree[0] instanceof Namespace_)) {
-            throw new Exception("Could not locate namespace definition in ' . $this->classShortName . ' class");
+            throw new Exception("Could not locate namespace definition for class '". $this->classShortName ."'");
         }
 
         $this->namespace = $this->syntaxTree[0];

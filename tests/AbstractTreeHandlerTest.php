@@ -54,4 +54,18 @@ class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
         $handler->handle();
     }
 
+    public function test_exception_is_thrown_when_no_namespace_is_found()
+    {
+        $this->setExpectedException(
+            Exception::class,
+            "Could not locate namespace definition for class 'Bar'"
+        );
+
+        $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
+
+        $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
+
+        $handler->handle();
+    }
+
 }

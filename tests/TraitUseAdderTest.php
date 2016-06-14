@@ -59,44 +59,37 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function test_normal_behavior_reverse_order()
-    {
-
-        $this->copy('BarClass.stub', 'BarClass.php');
-
-        $this->includeFile('Trait1.php');
-        $this->includeFile('Trait2.php');
-        $this->includeFile('Trait3.php');
-        $this->includeFile('BarClass.php');
-
-        $adder = Traitor::addTrait('Trait2Namespace\Trait2');
-        $adder->addTraits(['Trait1', 'Some\Long\Trait3\Name\Space\Trait3'])->toClass(\Baz\BarClass::class);
-
-        $this->copy('BarClass.php', 'NewBarClass.php');
-
-        $this->replaceInFile("BarClass", "NewBarClass", "NewBarClass.php");
-
-        $this->includeFile('NewBarClass.php');
-
-        $classUses = class_uses('\Baz\NewBarClass');
-
-        $this->assertArrayHasKey('Trait1', $classUses);
-        $this->assertArrayHasKey('Trait2Namespace\Trait2', $classUses);
-        $this->assertArrayHasKey('Some\Long\Trait3\Name\Space\Trait3', $classUses);
-
-        unlink(__DIR__ . '/TestingClasses/NewBarClass.php');
-
-        $this->copy('BarClass.stub', 'BarClass.php');
-
-    }
-
-    public function test_exception_is_thrown_when_trying_to_call_toClass_before_calling_addTrait()
+    public function test_bad_method_call_exception_is_thrown_when_trying_to_call_toClass_before_calling_addTrait()
     {
         $this->includeFile('BarClass.php');
 
         $this->setExpectedException(BadMethodCallException::class);
 
         (new TraitUseAdder())->toClass('\Baz\BarClass');
+    }
+
+    public function test_reflection_exception_is_thrown_when_class_does_not_exist()
+    {
+        $className = 'Baz\BarClass';
+
+        $this->setExpectedException(ReflectionException::class, "Class ${className} does not exist");
+        
+        $this->includeFile('Trait1.php');
+
+        Traitor::addTrait(Trait1::class)->toClass($className);
+        
+    }
+
+    public function test_reflection_exception_is_thrown_when_trait_does_not_exist()
+    {
+        $traitName = 'Trait1';
+
+        $this->setExpectedException(ReflectionException::class, "Class ${traitName} does not exist");
+
+        $this->includeFile('BarClass.php');
+
+        Traitor::addTrait('Trait1');
+
     }
 
 }
