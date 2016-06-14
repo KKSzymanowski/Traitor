@@ -9,12 +9,12 @@ use Traitor\Handlers\AbstractTreeHandler;
 
 class TraitUseAdder
 {
-
-    /** @var  array */
+    /** @var array */
     protected $traitReflections = [];
 
     /**
-     * @param  string $trait
+     * @param string $trait
+     *
      * @return static
      */
     public function addTrait($trait)
@@ -23,7 +23,8 @@ class TraitUseAdder
     }
 
     /**
-     * @param  array $traits
+     * @param array $traits
+     *
      * @return static
      */
     public function addTraits(array $traits)
@@ -36,10 +37,12 @@ class TraitUseAdder
     }
 
     /**
-     * @param  string $class
-     * @return $this
+     * @param string $class
+     *
      * @throws BadMethodCallException
      * @throws RuntimeException
+     *
+     * @return $this
      */
     public function toClass($class)
     {
@@ -54,7 +57,7 @@ class TraitUseAdder
         $content = file($filePath);
 
         if ($content === false) {
-            throw new RuntimeException("Error on reading from file " . $filePath);
+            throw new RuntimeException('Error on reading from file '.$filePath);
         }
 
         foreach ($this->traitReflections as $traitReflection) {
@@ -68,10 +71,9 @@ class TraitUseAdder
         }
 
         if (file_put_contents($filePath, implode($content)) === false) {
-            throw new RuntimeException("Error on writing to file " . $filePath);
+            throw new RuntimeException('Error on writing to file '.$filePath);
         }
 
         return $this;
     }
-
 }
