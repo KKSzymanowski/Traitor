@@ -42,6 +42,9 @@ class AbstractTreeHandler implements Handler
     /** @var Class_ */
     protected $classAbstractTree;
 
+    /** @var string */
+    protected $lineEnding = "\n";
+
     /**
      * @param array  $content
      * @param string $trait
@@ -50,6 +53,8 @@ class AbstractTreeHandler implements Handler
     public function __construct($content, $trait, $class)
     {
         $this->content = $content;
+
+        $this->determineLineEnding();
 
         $this->trait = $trait;
         $traitParts = explode('\\', $trait);
@@ -117,12 +122,12 @@ class AbstractTreeHandler implements Handler
         $lastImport = $this->getLastImport();
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
-            $newImport = 'use '.$this->trait.";\n";
+            $newImport = 'use '.$this->trait.';'.$this->lineEnding;
 
-            array_splice($this->content, $lineNumber, 0, "\n");
+            array_splice($this->content, $lineNumber, 0, $this->lineEnding);
         } else {
             $lineNumber = $this->getLastImport()->getAttribute('endLine');
-            $newImport = 'use '.$this->trait.";\n";
+            $newImport = 'use '.$this->trait.';'.$this->lineEnding;
         }
 
         array_splice($this->content, $lineNumber, 0, $newImport);
@@ -161,7 +166,7 @@ class AbstractTreeHandler implements Handler
             ++$line;
         }
 
-        $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.";\n";
+        $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.';'.$this->lineEnding;
 
         array_splice($this->content, $line, 0, $newTraitUse);
 
@@ -303,6 +308,23 @@ class AbstractTreeHandler implements Handler
         // -1 because we want place it before
         // another -1 because phpParser counts lines from 1
         return array_values($this->classAbstractTree->stmts)[0]->getLine() - 2;
+    }
+
+    /**
+     * Default line ending is set to LF.
+     *
+     * If there is at least one line in the provided file
+     * and it contains CR+LF, change line ending CR+LF.
+     *
+     * @return $this
+     */
+    protected function determineLineEnding()
+    {
+        if (isset($this->content[0]) && strpos($this->content[0], "\r\n") !== false) {
+            $this->lineEnding = "\r\n";
+        }
+
+        return $this;
     }
 
     /**
