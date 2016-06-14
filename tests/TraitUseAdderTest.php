@@ -39,7 +39,7 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
         $this->includeFile('BarClass.php');
 
         $adder = Traitor::addTraits(['Trait1', 'Some\Long\Trait3\Name\Space\Trait3']);
-        $adder->addTrait('Trait2Namespace\Trait2')->toClass(\Baz\BarClass::class);
+        $adder->addTrait('Trait2Namespace\Trait2')->toClass('\Baz\BarClass');
 
         $this->copy('BarClass.php', 'NewBarClass.php');
 
@@ -63,7 +63,7 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
     {
         $this->includeFile('BarClass.php');
 
-        $this->setExpectedException(BadMethodCallException::class);
+        $this->setExpectedException('BadMethodCallException');
 
         (new TraitUseAdder())->toClass('\Baz\BarClass');
     }
@@ -72,11 +72,11 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
     {
         $className = 'Baz\BarClass';
 
-        $this->setExpectedException(ReflectionException::class, "Class ${className} does not exist");
+        $this->setExpectedException('ReflectionException', "Class ${className} does not exist");
         
         $this->includeFile('Trait1.php');
 
-        Traitor::addTrait(Trait1::class)->toClass($className);
+        Traitor::addTrait('Trait1')->toClass($className);
         
     }
 
@@ -84,7 +84,7 @@ class TraitUseAdderTest extends PHPUnit_Framework_TestCase
     {
         $traitName = 'Trait1';
 
-        $this->setExpectedException(ReflectionException::class, "Class ${traitName} does not exist");
+        $this->setExpectedException('ReflectionException', "Class ${traitName} does not exist");
 
         $this->includeFile('BarClass.php');
 

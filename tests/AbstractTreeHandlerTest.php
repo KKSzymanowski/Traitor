@@ -24,14 +24,20 @@ class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
 
             $this->assertEquals($newContent, implode($handler->toArray()));
 
-            $this->assertStringEqualsFile($pathExpected, $newContent, "Assertion failed for " . $file->getFilename());
+            $expectedContent = file_get_contents($pathExpected);
+
+            $expectedContent = str_replace("\r\n", "\n", $expectedContent);
+
+            $newContent = str_replace("\r\n", "\n", $newContent);
+
+            $this->assertEquals($expectedContent, $newContent, "Assertion failed for " . $file->getFilename());
         }
 
     }
     
     public function test_exception_is_thrown_when_class_is_not_found()
     {
-        $this->setExpectedException(Exception::class, "Class Bar not found");
+        $this->setExpectedException('Exception', "Class Bar not found");
 
         $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
 
@@ -43,7 +49,7 @@ class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
     public function test_exception_is_thrown_on_parsing_error()
     {
         $this->setExpectedException(
-            Exception::class,
+            'Exception',
             "Error on parsing Bar class\nSyntax error, unexpected '}', expecting T_FUNCTION on line 7"
         );
 
@@ -57,7 +63,7 @@ class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
     public function test_exception_is_thrown_when_no_namespace_is_found()
     {
         $this->setExpectedException(
-            Exception::class,
+            'Exception',
             "Could not locate namespace definition for class 'Bar'"
         );
 
