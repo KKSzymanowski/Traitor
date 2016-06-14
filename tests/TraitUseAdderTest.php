@@ -3,9 +3,6 @@
 use Traitor\Traitor;
 use Traitor\TraitUseAdder;
 
-if(class_exists('PHPUnit_Util_Configuration') == false)
-    require_once "C:/Users/Jakub/Code/Traitor/vendor/autoload.php";
-
 /** @runTestsInSeparateProcesses */
 class TraitUseAdderTest extends PHPUnit_Framework_TestCase
 {
