@@ -38,12 +38,15 @@ Adding a new trait use statement does not change in any way formatting of your f
 
 If the trait is not present in the `use` section below the namespace declaration, it will be also added there, below any existing imports.
 
-If it's not present in the `use` section in the class body, it will be added there below any existing use statements, on it's own line:
+If it's not present in the `use` section in the class body, it will be added there above first existing use statement, on it's own line:
 ```
+use Bar\PreviouslyExistingTrait;
+use Baz\NewlyAddedTrait; // Here
+
 class Foo
 {
+    use NewlyAddedTrait; // And here
     use PreviouslyExistingTrait;
-    use NewlyAddedTrait;
 }
 ```
 

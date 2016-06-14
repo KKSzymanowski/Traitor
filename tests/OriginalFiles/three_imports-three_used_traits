@@ -1,0 +1,14 @@
+<?php
+
+namespace Foo;
+
+use Baz\SomeExistingTrait;
+use Quz\SomeOtherExistingTrait;
+use Qax\SomeEvenOtherExistingTrait;
+
+class Bar
+{
+    use SomeExistingTrait;
+    use SomeOtherExistingTrait;
+    use SomeEvenOtherExistingTrait;
+}

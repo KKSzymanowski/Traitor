@@ -6,6 +6,6 @@ use Baz\FooTrait;
 
 class Bar
 {
-    use SomeExistingTrait;
     use FooTrait;
+    use SomeExistingTrait;
 }

@@ -263,10 +263,10 @@ class AbstractTreeHandler implements Handler
         /** @var TraitUse $statement */
         foreach ($traitUses as $statement) {
 
-            foreach($statement->traits as $traitUse)
-            {
+            foreach ($statement->traits as $traitUse) {
                 if ($traitUse->toString() == $this->trait
-                    || $traitUse->toString() == $this->traitShortName) {
+                    || $traitUse->toString() == $this->traitShortName
+                ) {
                     return true;
                 }
             }
@@ -303,7 +303,9 @@ class AbstractTreeHandler implements Handler
             return $this->classAbstractTree->getLine();
         }
 
-        return array_values($this->classAbstractTree->stmts)[0]->getLine() - 1;
+        // -1 because we want place it before
+        // another -1 because phpParser counts lines from 1
+        return array_values($this->classAbstractTree->stmts)[0]->getLine() - 2;
     }
 
     /**

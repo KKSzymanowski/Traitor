@@ -2,10 +2,13 @@
 
 namespace Foo;
 
+use Baz\SomeExistingTrait;
+use Quz\SomeOtherExistingTrait;
 use Baz\FooTrait;
 
 class Bar
 {
     use FooTrait;
     use SomeExistingTrait;
+    use SomeOtherExistingTrait;
 }
