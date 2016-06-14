@@ -144,27 +144,7 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
-        $line = $this->getFirstTraitUseLine();
-
-        /*
-         * If class definition is like this:
-         *
-         * class Foo
-         * {
-         *     // Content
-         * }
-         *
-         * not like this:
-         *
-         * class Foo {
-         *     // Content
-         * }
-         *
-         * we need to add the use statement one line further
-         */
-        if (strpos($this->content[$this->classAbstractTree->getLine() - 1], '{') === false) {
-            ++$line;
-        }
+        $line = $this->getNewTraitUseLine();
 
         $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.';'.$this->lineEnding;
 
@@ -299,15 +279,35 @@ class AbstractTreeHandler implements Handler
     /**
      * @return int
      */
-    protected function getFirstTraitUseLine()
+    protected function getNewTraitUseLine()
     {
-        if (count($this->classAbstractTree->stmts) == 0) {
-            return $this->classAbstractTree->getLine();
+        $line = $this->classAbstractTree->getLine() + 1;
+
+       /* // -1 because we want place it before
+        // another -1 because phpParser counts lines from 1
+        $line = array_values($this->classAbstractTree->stmts)[0]->getLine() - 2;*/
+
+        /*
+         * If class definition is like this:
+         *
+         * class Foo
+         * {
+         *     // Content
+         * }
+         *
+         * not like this:
+         *
+         * class Foo {
+         *     // Content
+         * }
+         *
+         * we need to subtract one line
+         */
+        if (strpos($this->content[$this->classAbstractTree->getLine() - 1], '{') !== false) {
+            --$line;
         }
 
-        // -1 because we want place it before
-        // another -1 because phpParser counts lines from 1
-        return array_values($this->classAbstractTree->stmts)[0]->getLine() - 2;
+        return $line;
     }
 
     /**
