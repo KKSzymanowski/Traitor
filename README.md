@@ -1,4 +1,8 @@
 # Traitor
+[![StyleCI](https://styleci.io/repos/60994435/shield?style=flat)](https://styleci.io/repos/60994435)
+[![Build Status](https://travis-ci.org/KKSzymanowski/Traitor.svg?branch=master)](https://travis-ci.org/KKSzymanowski/Traitor)
+[![Latest Stable Version](https://poser.pugx.org/kkszymanowski/traitor/v/stable)](https://packagist.org/packages/kkszymanowski/traitor)
+[![License](https://poser.pugx.org/kkszymanowski/traitor/license)](https://packagist.org/packages/kkszymanowski/traitor)
 
 A PHP package for automatically adding a `trait use statement` to a given class.
 
