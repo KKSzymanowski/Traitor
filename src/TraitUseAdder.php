@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * KKSzymanowski/Traitor
+ * Add a trait use statement to existing class
+ *
+ * @package KKSzymanowski/Traitor
+ * @author Kuba Szymanowski <kuba.szymanowski@inf24.pl>
+ * @link https://github.com/kkszymanowski/traitor
+ * @license MIT
+ */
+
 namespace Traitor;
 
 use BadMethodCallException;
