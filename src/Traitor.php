@@ -40,7 +40,7 @@ class Traitor
 
     /**
      * Check if provided class uses a specific trait.
-     * 
+     *
      * @param string $className
      * @param string $traitName
      * @return bool
