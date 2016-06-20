@@ -37,4 +37,16 @@ class Traitor
 
         return $instance->addTraits($traits);
     }
+
+    /**
+     * Check if provided class uses a specific trait.
+     * 
+     * @param string $className
+     * @param string $traitName
+     * @return bool
+     */
+    public static function alreadyUses($className, $traitName)
+    {
+        return in_array($traitName, class_uses($className));
+    }
 }

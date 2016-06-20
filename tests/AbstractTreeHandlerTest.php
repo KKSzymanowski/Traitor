@@ -2,33 +2,31 @@
 
 use Traitor\Handlers\AbstractTreeHandler;
 
-class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
+class AbstractTreeHandlerTest extends TestCase
 {
-    public function test_normal_behavior()
+    /**
+     * @dataProvider testCaseDataProvider
+     * @param SplFileInfo $file
+     */
+    public function test_normal_behavior($file)
     {
-        // Get all the files in OriginalFiles directory
-        $files = new FilesystemIterator(__DIR__ . '/OriginalFiles', FilesystemIterator::SKIP_DOTS);
+        $pathOriginal = $file->getRealPath();
+        $pathExpected = str_replace('OriginalFiles', 'ExpectedFiles', $pathOriginal);
 
-        // Foreach file add a Trait and compare output against expected file
-        /** @var SplFileInfo $file */
-        foreach ($files as $file) {
-            $pathOriginal = $file->getRealPath();
-            $pathExpected = str_replace('OriginalFiles', 'ExpectedFiles', $pathOriginal);
+        $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
 
-            $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
+        $newContent = $handler->handle()->toString();
 
-            $newContent = $handler->handle()->toString();
+        $this->assertEquals($newContent, implode($handler->toArray()));
 
-            $this->assertEquals($newContent, implode($handler->toArray()));
+        $expectedContent = file_get_contents($pathExpected);
 
-            $expectedContent = file_get_contents($pathExpected);
+        $expectedContent = str_replace("\r\n", "\n", $expectedContent);
 
-            $expectedContent = str_replace("\r\n", "\n", $expectedContent);
+        $newContent = str_replace("\r\n", "\n", $newContent);
 
-            $newContent = str_replace("\r\n", "\n", $newContent);
+        $this->assertEquals($expectedContent, $newContent, 'Assertion failed for ' . $file->getFilename());
 
-            $this->assertEquals($expectedContent, $newContent, 'Assertion failed for ' . $file->getFilename());
-        }
     }
 
     public function test_exception_is_thrown_when_class_is_not_found()
@@ -68,5 +66,18 @@ class AbstractTreeHandlerTest extends PHPUnit_Framework_TestCase
         $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
 
         $handler->handle();
+    }
+
+    public function testCaseDataProvider()
+    {
+        $files = new FilesystemIterator(__DIR__ . '/OriginalFiles', FilesystemIterator::SKIP_DOTS);
+
+        $result = [];
+
+        foreach ($files as $file) {
+            $result[] = [$file];
+        }
+
+        return $result;
     }
 }

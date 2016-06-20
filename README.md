@@ -20,7 +20,7 @@ use Traitor\Traitor;
 Traitor::addTrait(FooTrait::class)->toClass(FooClass:class);
 ```
 - Add multiple traits:
-```
+```php
 use Traitor\Traitor;
 
 Traitor::addTraits([
@@ -28,9 +28,24 @@ Traitor::addTraits([
     BarTrait::class,
     BazTrait::class
 ])->toClass(FooClass:class);
+
+//or
+
+Traitor::addTrait(FooTrait::class)
+       ->addTrait(BarTrait::class)
+       ->addTrait(BazTrait::class)
+       ->toClass(FooClass:class);
+```
+- Check if class already uses trait:
+```php
+use Traitor\Traitor;
+
+$alreadyUses = Traitor::alreadyUses(FooClass::class, BarTrait::class);
 ```
 - Only generate output without changing files:
-```
+```php
+use Traitor\Handlers\AbstractTreeHandler;
+
 $handler = new AbstractTreeHandler(file($originalFilePath), FooTrait::class, BarClass::class);
 
 $newContent = $handler->handle()->toString();

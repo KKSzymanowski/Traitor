@@ -1,7 +1,11 @@
 {
   "name": "kkszymanowski/traitor",
   "description": "Add a trait use to existing PHP class",
-  "keywords": ["PHP", "trait", "add"],
+  "keywords": [
+    "PHP",
+    "trait",
+    "add"
+  ],
   "license": "MIT",
   "support": {
     "issues": "https://github.com/kkszymanowski/traitor/issues",
@@ -25,5 +29,10 @@
     "psr-4": {
       "Traitor\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/TestCase.php"
+    ]
   }
 }
