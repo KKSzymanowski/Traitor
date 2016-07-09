@@ -358,7 +358,7 @@ class AbstractTreeHandler implements Handler
 
     protected function getParser()
     {
-        $refParser = new \ReflectionClass(\PhpParser\Parser::class);
+        $refParser = new \ReflectionClass('\PhpParser\Parser');
 
         if (! $refParser->isInterface()) {
             /*
