@@ -358,15 +358,15 @@ class AbstractTreeHandler implements Handler
 
     protected function getParser()
     {
-        $refParser   = new \ReflectionClass(\PhpParser\Parser::class);
+        $refParser = new \ReflectionClass(\PhpParser\Parser::class);
 
-        if (!$refParser->isInterface()) {
-            /**
+        if (! $refParser->isInterface()) {
+            /*
              * If we are running nikic/php-parser 1.*
              */
             return new \PhpParser\Parser(new Lexer());
         } else {
-            /**
+            /*
              * If we are running nikic/php-parser 2.*
              */
             return (new \PhpParser\ParserFactory)->create(\PhpParser\ParserFactory::PREFER_PHP7);
