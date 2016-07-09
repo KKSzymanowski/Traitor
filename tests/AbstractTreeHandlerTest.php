@@ -6,14 +6,14 @@ class AbstractTreeHandlerTest extends TestCase
 {
     /**
      * @dataProvider testCaseDataProvider
-     * @param SplFileInfo $file
+     * @param string $pathOriginal
+     * @param string $content
      */
-    public function test_normal_behavior($file)
+    public function test_normal_behavior($pathOriginal, $content)
     {
-        $pathOriginal = $file->getRealPath();
         $pathExpected = str_replace('OriginalFiles', 'ExpectedFiles', $pathOriginal);
 
-        $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
+        $handler = new AbstractTreeHandler($content, 'Baz\FooTrait', 'Foo\Bar');
 
         $newContent = $handler->handle()->toString();
 
@@ -25,7 +25,7 @@ class AbstractTreeHandlerTest extends TestCase
 
         $newContent = str_replace("\r\n", "\n", $newContent);
 
-        $this->assertEquals($expectedContent, $newContent, 'Assertion failed for ' . $file->getFilename());
+        $this->assertEquals($expectedContent, $newContent, 'Assertion failed for ' . $pathOriginal);
 
     }
 
@@ -75,7 +75,10 @@ class AbstractTreeHandlerTest extends TestCase
         $result = [];
 
         foreach ($files as $file) {
-            $result[] = [$file];
+            $content = file($file);
+
+            $result[] = [$file->getRealPath(), $content];
+            $result[] = [$file->getRealPath(), $this->replaceInArray("\r\n", "\n", $content)];
         }
 
         return $result;

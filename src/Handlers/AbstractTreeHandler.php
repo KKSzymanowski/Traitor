@@ -19,7 +19,6 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
-use PhpParser\Parser;
 
 class AbstractTreeHandler implements Handler
 {
@@ -174,7 +173,7 @@ class AbstractTreeHandler implements Handler
         $flatContent = implode($this->content);
 
         try {
-            $parser = new Parser(new Lexer);
+            $parser = $this->getParser();
             $this->syntaxTree = $parser->parse($flatContent);
         } catch (Error $e) {
             throw new Exception('Error on parsing '.$this->classShortName." class\n".$e->getMessage());
@@ -355,5 +354,22 @@ class AbstractTreeHandler implements Handler
         }
 
         return '    ';
+    }
+
+    protected function getParser()
+    {
+        $refParser   = new \ReflectionClass(\PhpParser\Parser::class);
+
+        if (!$refParser->isInterface()) {
+            /**
+             * If we are running nikic/php-parser 1.*
+             */
+            return new \PhpParser\Parser(new Lexer());
+        } else {
+            /**
+             * If we are running nikic/php-parser 2.*
+             */
+            return (new \PhpParser\ParserFactory)->create(\PhpParser\ParserFactory::PREFER_PHP7);
+        }
     }
 }

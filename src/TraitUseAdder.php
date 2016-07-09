@@ -66,10 +66,6 @@ class TraitUseAdder
 
         $content = file($filePath);
 
-        if ($content === false) {
-            throw new RuntimeException('Error on reading from file '.$filePath);
-        }
-
         foreach ($this->traitReflections as $traitReflection) {
             $handler = new AbstractTreeHandler(
                 $content,
@@ -80,9 +76,7 @@ class TraitUseAdder
             $content = $handler->handle()->toArray();
         }
 
-        if (file_put_contents($filePath, implode($content)) === false) {
-            throw new RuntimeException('Error on writing to file '.$filePath);
-        }
+        file_put_contents($filePath, implode($content));
 
         return $this;
     }

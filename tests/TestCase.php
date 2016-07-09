@@ -23,4 +23,13 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     {
         include __DIR__ . '/TestingClasses/' . $file;
     }
+
+    protected function replaceInArray($search, $replace, array $subject)
+    {
+        foreach ($subject as $key => $row) {
+            $subject[$key] = str_replace($search, $replace, $row);
+        }
+
+        return $subject;
+    }
 }
