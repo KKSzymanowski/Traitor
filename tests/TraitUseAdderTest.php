@@ -6,7 +6,6 @@ use Traitor\TraitUseAdder;
 /** @runTestsInSeparateProcesses */
 class TraitUseAdderTest extends TestCase
 {
-
     public function test_normal_behavior()
     {
         $this->copy('BarClass.stub', 'BarClass.php');
@@ -31,7 +30,7 @@ class TraitUseAdderTest extends TestCase
         $this->assertArrayHasKey('Trait2Namespace\Trait2', $classUses);
         $this->assertArrayHasKey('Some\Long\Trait3\Name\Space\Trait3', $classUses);
 
-        unlink(__DIR__ . '/TestingClasses/NewBarClass.php');
+        unlink(__DIR__.'/TestingClasses/NewBarClass.php');
 
         $this->copy('BarClass.stub', 'BarClass.php');
     }

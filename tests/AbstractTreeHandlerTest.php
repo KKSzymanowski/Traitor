@@ -25,15 +25,14 @@ class AbstractTreeHandlerTest extends TestCase
 
         $newContent = str_replace("\r\n", "\n", $newContent);
 
-        $this->assertEquals($expectedContent, $newContent, 'Assertion failed for ' . $pathOriginal);
-
+        $this->assertEquals($expectedContent, $newContent, 'Assertion failed for '.$pathOriginal);
     }
 
     public function test_exception_is_thrown_when_class_is_not_found()
     {
         $this->setExpectedException('Exception', 'Class Bar not found');
 
-        $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
+        $pathOriginal = __DIR__.'/Other/'.__FUNCTION__;
 
         $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
 
@@ -44,10 +43,10 @@ class AbstractTreeHandlerTest extends TestCase
     {
         $this->setExpectedException(
             'Exception',
-            "Error on parsing Bar class"
+            'Error on parsing Bar class'
         );
 
-        $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
+        $pathOriginal = __DIR__.'/Other/'.__FUNCTION__;
 
         $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
 
@@ -61,7 +60,7 @@ class AbstractTreeHandlerTest extends TestCase
             "Could not locate namespace definition for class 'Bar'"
         );
 
-        $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
+        $pathOriginal = __DIR__.'/Other/'.__FUNCTION__;
 
         $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
 
@@ -70,7 +69,7 @@ class AbstractTreeHandlerTest extends TestCase
 
     public function testCaseDataProvider()
     {
-        $files = new FilesystemIterator(__DIR__ . '/OriginalFiles', FilesystemIterator::SKIP_DOTS);
+        $files = new FilesystemIterator(__DIR__.'/OriginalFiles', FilesystemIterator::SKIP_DOTS);
 
         $result = [];
 

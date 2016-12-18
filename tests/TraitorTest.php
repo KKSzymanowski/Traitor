@@ -1,13 +1,11 @@
 <?php
 
-use Traitor\Handlers\AbstractTreeHandler;
 use Traitor\Traitor;
-use Traitor\TraitUseAdder;
+use Traitor\Handlers\AbstractTreeHandler;
 
 /** @runTestsInSeparateProcesses */
 class TraitorTest extends TestCase
 {
-
     public function test_class_already_uses_trait_returns_false_when_not()
     {
         $this->copy('BarClass.stub', 'BarClass.php');
@@ -24,7 +22,7 @@ class TraitorTest extends TestCase
     {
         $this->copy('BarClass.stub', 'BarClass.php');
 
-        $path = __DIR__ . '/TestingClasses/BarClass.php';
+        $path = __DIR__.'/TestingClasses/BarClass.php';
 
         $handler = new AbstractTreeHandler(file($path), 'Trait1', 'Baz\BarClass');
 
@@ -39,6 +37,4 @@ class TraitorTest extends TestCase
 
         $this->assertTrue($result);
     }
-
-    
 }
