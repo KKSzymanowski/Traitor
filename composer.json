@@ -1,11 +1,7 @@
 {
   "name": "kkszymanowski/traitor",
-  "description": "Add a trait use to existing PHP class",
-  "keywords": [
-    "PHP",
-    "trait",
-    "add"
-  ],
+  "description": "Add a trait use statement to existing PHP class",
+  "keywords": ["PHP", "trait", "add"],
   "license": "MIT",
   "support": {
     "issues": "https://github.com/kkszymanowski/traitor/issues",
@@ -20,7 +16,7 @@
   ],
   "require": {
     "php": ">=5.4",
-    "nikic/php-parser": "^1.0|^2.0"
+    "nikic/php-parser": "^1.0|^2.0|^3.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.1"

@@ -44,7 +44,7 @@ class AbstractTreeHandlerTest extends TestCase
     {
         $this->setExpectedException(
             'Exception',
-            "Error on parsing Bar class\nSyntax error, unexpected '}', expecting T_FUNCTION on line 7"
+            "Error on parsing Bar class"
         );
 
         $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
