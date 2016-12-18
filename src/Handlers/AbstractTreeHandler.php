@@ -15,10 +15,10 @@ namespace Traitor\Handlers;
 use Exception;
 use PhpParser\Error;
 use PhpParser\Lexer;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Stmt\Namespace_;
 
 class AbstractTreeHandler implements Handler
 {

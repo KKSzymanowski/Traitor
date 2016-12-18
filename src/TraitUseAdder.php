@@ -12,9 +12,9 @@
 
 namespace Traitor;
 
-use BadMethodCallException;
 use ReflectionClass;
 use RuntimeException;
+use BadMethodCallException;
 use Traitor\Handlers\AbstractTreeHandler;
 
 class TraitUseAdder
