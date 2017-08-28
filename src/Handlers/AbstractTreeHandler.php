@@ -292,17 +292,17 @@ class AbstractTreeHandler implements Handler
     protected function getNewTraitUseLine()
     {
         // If the first statement is a trait use, insert the new trait use before it.
-        if(isset($this->classAbstractTree->stmts[0])) {
+        if (isset($this->classAbstractTree->stmts[0])) {
             $firstStatement = $this->classAbstractTree->stmts[0];
 
-            if($firstStatement instanceof TraitUse) {
+            if ($firstStatement instanceof TraitUse) {
                 return $firstStatement->getLine() - 1;
             }
         }
 
         // If the first statement is not a trait use, insert the new one just after the opening bracket.
-        for($line = $this->classAbstractTree->getLine() - 1;$line<count($this->content);++$line) {
-            if(strpos($this->content[$line], '{') !== false) {
+        for ($line = $this->classAbstractTree->getLine() - 1; $line < count($this->content); ++$line) {
+            if (strpos($this->content[$line], '{') !== false) {
                 return $line + 1;
             }
         }
