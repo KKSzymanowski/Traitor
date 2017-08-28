@@ -1,0 +1,13 @@
+<?php
+
+namespace Foo;
+
+use Baz\FooTrait;
+
+class Bar extends Model implements AuthenticatableContract,
+                                   CanResetPasswordContract
+{
+
+    use FooTrait;
+    use Authenticatable, CanResetPassword;
+}

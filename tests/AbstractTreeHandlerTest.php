@@ -77,8 +77,8 @@ class AbstractTreeHandlerTest extends TestCase
         foreach ($files as $file) {
             $content = file($file);
 
-            $result[] = [$file->getRealPath(), $content];
-            $result[] = [$file->getRealPath(), $this->replaceInArray("\r\n", "\n", $content)];
+            $result[$file->getBasename()] = [$file->getRealPath(), $content];
+            $result[$file->getBasename() . '_CRLF'] = [$file->getRealPath(), $this->replaceInArray("\r\n", "\n", $content)];
         }
 
         return $result;

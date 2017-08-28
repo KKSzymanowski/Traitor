@@ -287,36 +287,27 @@ class AbstractTreeHandler implements Handler
 
     /**
      * @return int
+     * @throws Exception
      */
     protected function getNewTraitUseLine()
     {
-        $line = $this->classAbstractTree->getLine() + 1;
+        // If the first statement is a trait use, insert the new trait use before it.
+        if(isset($this->classAbstractTree->stmts[0])) {
+            $firstStatement = $this->classAbstractTree->stmts[0];
 
-       /* // -1 because we want place it before
-        // another -1 because phpParser counts lines from 1
-        $line = array_values($this->classAbstractTree->stmts)[0]->getLine() - 2;*/
-
-        /*
-         * If class definition is like this:
-         *
-         * class Foo
-         * {
-         *     // Content
-         * }
-         *
-         * not like this:
-         *
-         * class Foo {
-         *     // Content
-         * }
-         *
-         * we need to subtract one line
-         */
-        if (strpos($this->content[$this->classAbstractTree->getLine() - 1], '{') !== false) {
-            --$line;
+            if($firstStatement instanceof TraitUse) {
+                return $firstStatement->getLine() - 1;
+            }
         }
 
-        return $line;
+        // If the first statement is not a trait use, insert the new one just after the opening bracket.
+        for($line = $this->classAbstractTree->getLine() - 1;$line<count($this->content);++$line) {
+            if(strpos($this->content[$line], '{') !== false) {
+                return $line + 1;
+            }
+        }
+
+        throw new Exception("Opening bracket not found in class [$this->classShortName]");
     }
 
     /**
