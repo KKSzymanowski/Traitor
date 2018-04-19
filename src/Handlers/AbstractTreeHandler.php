@@ -352,14 +352,10 @@ class AbstractTreeHandler implements Handler
         $refParser = new \ReflectionClass('\PhpParser\Parser');
 
         if (! $refParser->isInterface()) {
-            /*
-             * If we are running nikic/php-parser 1.*
-             */
+            // If we are running nikic/php-parser 1.*
             return new \PhpParser\Parser(new Lexer());
         } else {
-            /*
-             * If we are running nikic/php-parser 2.*
-             */
+            // If we are running nikic/php-parser 2.*, 3.* or 4.*
             return (new \PhpParser\ParserFactory)->create(\PhpParser\ParserFactory::PREFER_PHP7);
         }
     }
