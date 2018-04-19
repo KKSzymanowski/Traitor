@@ -301,7 +301,7 @@ class AbstractTreeHandler implements Handler
         }
 
         // If the first statement is not a trait use, insert the new one just after the opening bracket.
-        for ($line = $this->classAbstractTree->getLine() - 1; $line < count($this->content); ++$line) {
+        for ($line = $this->classAbstractTree->getLine() - 1; $line < count($this->content); $line++) {
             if (strpos($this->content[$line], '{') !== false) {
                 return $line + 1;
             }
