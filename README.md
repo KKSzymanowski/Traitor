@@ -27,14 +27,14 @@ Traitor::addTraits([
     FooTrait::class,
     BarTrait::class,
     BazTrait::class
-])->toClass(FooClass:class);
+])->toClass(FooClass::class);
 
 //or
 
 Traitor::addTrait(FooTrait::class)
        ->addTrait(BarTrait::class)
        ->addTrait(BazTrait::class)
-       ->toClass(FooClass:class);
+       ->toClass(FooClass::class);
 ```
 - Check if class already uses trait:
 ```php
