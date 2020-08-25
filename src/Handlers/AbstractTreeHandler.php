@@ -15,6 +15,7 @@ namespace Traitor\Handlers;
 use Exception;
 use PhpParser\Error;
 use PhpParser\Lexer;
+use PhpParser\Node\Stmt\Declare_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\TraitUse;
@@ -81,9 +82,9 @@ class AbstractTreeHandler implements Handler
     public function handle()
     {
         $this->buildSyntaxTree()
-             ->addTraitImport()
-             ->buildSyntaxTree()
-             ->addTraitUseStatement();
+            ->addTraitImport()
+            ->buildSyntaxTree()
+            ->addTraitUseStatement();
 
         return $this;
     }
@@ -112,10 +113,10 @@ class AbstractTreeHandler implements Handler
     protected function buildSyntaxTree()
     {
         $this->parseContent()
-             ->retrieveNamespace()
-             ->retrieveImports()
-             ->retrieveClasses()
-             ->findClassDefinition();
+            ->retrieveNamespace()
+            ->retrieveImports()
+            ->retrieveClasses()
+            ->findClassDefinition();
 
         return $this;
     }
@@ -189,13 +190,28 @@ class AbstractTreeHandler implements Handler
      */
     protected function retrieveNamespace()
     {
-        if (! isset($this->syntaxTree[0]) || ! ($this->syntaxTree[0] instanceof Namespace_)) {
+        $syntaxTree = $this->hasDeclare() ? $this->syntaxTree[1] : $this->syntaxTree[0];
+
+        if (! isset($syntaxTree) || ! ($syntaxTree instanceof Namespace_)) {
             throw new Exception("Could not locate namespace definition for class '".$this->classShortName."'");
         }
 
-        $this->namespace = $this->syntaxTree[0];
+        $this->namespace = $syntaxTree;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasDeclare()
+    {
+        if ($this->syntaxTree[0] instanceof Declare_)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**
