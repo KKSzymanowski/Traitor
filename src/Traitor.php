@@ -39,6 +39,18 @@ class Traitor
     }
 
     /**
+     * @param string $trait
+     *
+     * @return TraitUseRemover
+     */
+    public static function removeTrait($trait)
+    {
+        $instance = new TraitUseRemover();
+
+        return $instance->removeTraits([$trait]);
+    }
+
+    /**
      * Check if provided class uses a specific trait.
      *
      * @param string $className

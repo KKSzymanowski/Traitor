@@ -90,6 +90,19 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
+     * @return $this
+     */
+    public function handleRemove()
+    {
+        $this->buildSyntaxTree()
+            ->removeTraitImport()
+            ->buildSyntaxTree()
+            ->addTraitUseStatement();
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function toString()
@@ -142,6 +155,30 @@ class AbstractTreeHandler implements Handler
         }
 
         array_splice($this->content, $lineNumber, 0, $newImport);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function removeTraitImport()
+    {
+        if (!$this->hasTraitImport()) {
+            return $this;
+        }
+
+        $lastImport = $this->getLastImport();
+
+        $this->importStatements = array_filter($this->namespace->stmts, function ($statement) {
+            return $statement instanceof Use_;
+        });
+
+        foreach ($this->importStatements as $statement) {
+            if ($statement->uses[0]->name->toString() == $this->trait) {
+                unset($this->content[$statement->getLine() - 1]);
+            }
+        }
 
         return $this;
     }
