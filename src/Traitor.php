@@ -61,4 +61,15 @@ class Traitor
     {
         return in_array($traitName, class_uses($className));
     }
+
+    public static function alreadyUsesInterface($interfaceName, $extendedInterfaceName)
+    {
+        $classReflection = new \ReflectionClass($interfaceName);
+
+        if ($classReflection->isInterface()) {
+            return in_array($extendedInterfaceName, $classReflection->getInterfaceNames());
+        }
+
+        return false;
+    }
 }
