@@ -447,8 +447,8 @@ class AbstractTreeHandler implements Handler
     protected function getInterfaceLine()
     {
         for ($line = 0; $line < count($this->content); $line++) {
-            if (strpos($this->content[$line], 'interface') !== false) {
-                return $line;
+            if (strpos($this->content[$line], '{') !== false) {
+                return $line - 1;
             }
         }
 
