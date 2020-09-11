@@ -15,6 +15,7 @@ namespace Traitor\Handlers;
 use Exception;
 use PhpParser\Error;
 use PhpParser\Lexer;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Declare_;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Use_;
@@ -112,6 +113,19 @@ class AbstractTreeHandler implements Handler
             ->addTraitImport()
             ->buildInterfaceSyntaxTree()
             ->addExtendedInterface();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function handleRemoveInterface()
+    {
+        $this->buildInterfaceSyntaxTree()
+            ->removeTraitImport()
+            ->buildInterfaceSyntaxTree()
+            ->removeExtendedImportStatement();
 
         return $this;
     }
@@ -232,10 +246,20 @@ class AbstractTreeHandler implements Handler
     {
         $line = $this->getInterfaceLine();
 
-        $newInterfaceExtend = $this->content[$line] . ', ' . $this->traitShortName;
+        if ($this->alreadyExtendsInterface()) {
+            return $this;
+        }
 
-        array_splice($this->content, $line, 0, $newInterfaceExtend);
-        unset($this->content[$line + 1]);
+        $newInterfaceExtend = $this->traitShortName . "\n";
+
+        $interfaceLineLength = strlen($this->content[$line]);
+
+        $newCommaSeparator = substr_replace($this->content[$line], ',', $interfaceLineLength - 1, 0);
+
+
+        array_splice($this->content, $line, 0, $newCommaSeparator);
+        array_splice($this->content, $line + 1, 0, $newInterfaceExtend);
+        unset($this->content[$line + 2]);
 
         return $this;
     }
@@ -260,6 +284,42 @@ class AbstractTreeHandler implements Handler
                     || $traitUse->toString() == $this->traitShortName
                 ) {
                     unset($this->content[$traitUse->getLine()]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function removeExtendedImportStatement()
+    {
+        $extendedImports = array_filter($this->classAbstractTree->extends, function ($statement) {
+            return $statement instanceof Name;
+        });
+
+        if (!$this->alreadyExtendsInterface()) {
+            return $this;
+        }
+
+        /** @var Name $statement */
+        foreach ($extendedImports as $statement) {
+            foreach ($statement->parts as $extendImport) {
+                if ($extendImport == $this->trait
+                    || $extendImport == $this->traitShortName
+                ) {
+                    $previousExtendImport = $this->content[$statement->getLine() - 1];
+
+                    if (substr($previousExtendImport, -2) == ",\n") {
+                        $newPreviousExtendImport = substr($this->content[$statement->getLine() - 1], 0, -2) . "\n";
+
+                        unset($this->content[$statement->getLine()]);
+                        unset($this->content[$statement->getLine() - 1]);
+
+                        array_splice($this->content, $statement->getLine() - 2, 0, $newPreviousExtendImport);
+                    }
                 }
             }
         }
@@ -388,6 +448,29 @@ class AbstractTreeHandler implements Handler
             foreach ($statement->traits as $traitUse) {
                 if ($traitUse->toString() == $this->trait
                     || $traitUse->toString() == $this->traitShortName
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function alreadyExtendsInterface()
+    {
+        $extendedImports = array_filter($this->classAbstractTree->extends, function ($statement) {
+            return $statement instanceof Name;
+        });
+
+        /** @var Name $statement */
+        foreach ($extendedImports as $statement) {
+            foreach ($statement->parts as $extendImport) {
+                if ($extendImport == $this->trait
+                    || $extendImport == $this->traitShortName
                 ) {
                     return true;
                 }
