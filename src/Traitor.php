@@ -61,4 +61,22 @@ class Traitor
     {
         return in_array($traitName, class_uses($className));
     }
+
+    /**
+     * Check if provided interface extends a specific interface.
+     *
+     * @param string $interfaceName
+     * @param string $extendedInterfaceName
+     * @return bool
+     */
+    public static function alreadyUsesInterface($interfaceName, $extendedInterfaceName)
+    {
+        $classReflection = new \ReflectionClass($interfaceName);
+
+        if ($classReflection->isInterface()) {
+            return in_array($extendedInterfaceName, $classReflection->getInterfaceNames());
+        }
+
+        return false;
+    }
 }

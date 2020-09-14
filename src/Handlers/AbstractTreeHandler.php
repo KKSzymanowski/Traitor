@@ -15,7 +15,9 @@ namespace Traitor\Handlers;
 use Exception;
 use PhpParser\Error;
 use PhpParser\Lexer;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Declare_;
+use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\TraitUse;
@@ -103,6 +105,32 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
+     * @return $this
+     */
+    public function handleInterface()
+    {
+        $this->buildInterfaceSyntaxTree()
+            ->addTraitImport()
+            ->buildInterfaceSyntaxTree()
+            ->addExtendedInterface();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function handleRemoveInterface()
+    {
+        $this->buildInterfaceSyntaxTree()
+            ->removeTraitImport()
+            ->buildInterfaceSyntaxTree()
+            ->removeExtendedImportStatement();
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function toString()
@@ -129,6 +157,22 @@ class AbstractTreeHandler implements Handler
             ->retrieveNamespace()
             ->retrieveImports()
             ->retrieveClasses()
+            ->findClassDefinition();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws Exception
+     *
+     */
+    protected function buildInterfaceSyntaxTree()
+    {
+        $this->parseContent()
+            ->retrieveNamespace()
+            ->retrieveImports()
+            ->retrieveInterface()
             ->findClassDefinition();
 
         return $this;
@@ -198,6 +242,31 @@ class AbstractTreeHandler implements Handler
     /**
      * @return $this
      */
+    protected function addExtendedInterface()
+    {
+        $line = $this->getInterfaceLine();
+
+        if ($this->alreadyExtendsInterface()) {
+            return $this;
+        }
+
+        $newInterfaceExtend = $this->traitShortName . "\n";
+
+        $interfaceLineLength = strlen($this->content[$line]);
+
+        $newCommaSeparator = substr_replace($this->content[$line], ',', $interfaceLineLength - 1, 0);
+
+
+        array_splice($this->content, $line, 0, $newCommaSeparator);
+        array_splice($this->content, $line + 1, 0, $newInterfaceExtend);
+        unset($this->content[$line + 2]);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     protected function removeTraiUseStatement()
     {
         if (!$this->alreadyUsesTrait()) {
@@ -215,6 +284,42 @@ class AbstractTreeHandler implements Handler
                     || $traitUse->toString() == $this->traitShortName
                 ) {
                     unset($this->content[$traitUse->getLine()]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function removeExtendedImportStatement()
+    {
+        $extendedImports = array_filter($this->classAbstractTree->extends, function ($statement) {
+            return $statement instanceof Name;
+        });
+
+        if (!$this->alreadyExtendsInterface()) {
+            return $this;
+        }
+
+        /** @var Name $statement */
+        foreach ($extendedImports as $statement) {
+            foreach ($statement->parts as $extendImport) {
+                if ($extendImport == $this->trait
+                    || $extendImport == $this->traitShortName
+                ) {
+                    $previousExtendImport = $this->content[$statement->getLine() - 1];
+
+                    if (substr($previousExtendImport, -2) == ",\n") {
+                        $newPreviousExtendImport = substr($this->content[$statement->getLine() - 1], 0, -2) . "\n";
+
+                        unset($this->content[$statement->getLine()]);
+                        unset($this->content[$statement->getLine() - 1]);
+
+                        array_splice($this->content, $statement->getLine() - 2, 0, $newPreviousExtendImport);
+                    }
                 }
             }
         }
@@ -296,6 +401,18 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
+     * @return $this
+     */
+    protected function retrieveInterface()
+    {
+        $this->classes = array_filter($this->namespace->stmts, function ($statement) {
+            return $statement instanceof Interface_;
+        });
+
+        return $this;
+    }
+
+    /**
      * @return \PhpParser\Node\Stmt\Use_
      */
     protected function getLastImport()
@@ -331,6 +448,29 @@ class AbstractTreeHandler implements Handler
             foreach ($statement->traits as $traitUse) {
                 if ($traitUse->toString() == $this->trait
                     || $traitUse->toString() == $this->traitShortName
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function alreadyExtendsInterface()
+    {
+        $extendedImports = array_filter($this->classAbstractTree->extends, function ($statement) {
+            return $statement instanceof Name;
+        });
+
+        /** @var Name $statement */
+        foreach ($extendedImports as $statement) {
+            foreach ($statement->parts as $extendImport) {
+                if ($extendImport == $this->trait
+                    || $extendImport == $this->traitShortName
                 ) {
                     return true;
                 }
@@ -381,6 +521,21 @@ class AbstractTreeHandler implements Handler
         }
 
         throw new Exception("Opening bracket not found in class [$this->classShortName]");
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    protected function getInterfaceLine()
+    {
+        for ($line = 0; $line < count($this->content); $line++) {
+            if (strpos($this->content[$line], '{') !== false) {
+                return $line - 1;
+            }
+        }
+
+        throw new Exception("Interface not found in class [$this->classShortName]");
     }
 
     /**

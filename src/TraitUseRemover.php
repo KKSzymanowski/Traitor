@@ -80,4 +80,39 @@ class TraitUseRemover
 
         return $this;
     }
+
+    /**
+     * @param string $interface
+     *
+     * @throws BadMethodCallException
+     * @throws RuntimeException
+     *
+     * @return $this
+     */
+    public function toInterface($interface)
+    {
+        if (count($this->traitReflections) == 0) {
+            throw new BadMethodCallException("No interfaces to add were found. Call 'addTrait' first.");
+        }
+
+        $interfaceReflection = new ReflectionClass($interface);
+
+        $filePath = $interfaceReflection->getFileName();
+
+        $content = file($filePath);
+
+        foreach ($this->traitReflections as $traitReflection) {
+            $handler = new AbstractTreeHandler(
+                $content,
+                $traitReflection->getName(),
+                $interfaceReflection->getName()
+            );
+
+            $content = $handler->handleRemoveInterface()->toArray();
+        }
+
+        file_put_contents($filePath, implode($content));
+
+        return $this;
+    }
 }
