@@ -250,16 +250,24 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
-        $newInterfaceExtend = $this->traitShortName . "\n";
+        $newInterfaceExtend = substr($this->content[$line],0 , -1) . ' extends ' . $this->traitShortName . "\n";
 
         $interfaceLineLength = strlen($this->content[$line]);
 
         $newCommaSeparator = substr_replace($this->content[$line], ',', $interfaceLineLength - 1, 0);
 
+        if (false !== strpos($this->content[$line], 'extends')) {
+            $newInterfaceExtend = $this->traitShortName . "\n";
 
-        array_splice($this->content, $line, 0, $newCommaSeparator);
+            array_splice($this->content, $line, 0, $newCommaSeparator);
+            array_splice($this->content, $line + 1, 0, $newInterfaceExtend);
+            unset($this->content[$line + 2]);
+
+            return $this;
+        }
+
         array_splice($this->content, $line + 1, 0, $newInterfaceExtend);
-        unset($this->content[$line + 2]);
+        unset($this->content[$line]);
 
         return $this;
     }
