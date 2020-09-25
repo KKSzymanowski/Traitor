@@ -320,7 +320,12 @@ class AbstractTreeHandler implements Handler
                 ) {
                     $previousExtendImport = $this->content[$statement->getLine() - 1];
 
-                    if (substr($previousExtendImport, -2) == ",\n") {
+                    if (1 === count($extendedImports)) {
+                        $interfaceWithoutExtendedInterface = str_replace($extendImport, "", $this->content[$statement->getLine()]);
+                        $interfaceWithoutExtend = str_replace('extends', "", $interfaceWithoutExtendedInterface);
+
+                        $this->content[$statement->getLine()] = trim($interfaceWithoutExtend) . "\n";
+                    } else if (substr($previousExtendImport, -2) == ",\n") {
                         $newPreviousExtendImport = substr($this->content[$statement->getLine() - 1], 0, -2) . "\n";
 
                         unset($this->content[$statement->getLine()]);
