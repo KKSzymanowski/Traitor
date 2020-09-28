@@ -13,6 +13,7 @@
 namespace Traitor\Handlers;
 
 use Exception;
+use PhpParser\Comment\Doc;
 use PhpParser\Error;
 use PhpParser\Lexer;
 use PhpParser\Node\Name;
@@ -187,18 +188,31 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
+        $startLine = null;
+        $endLine = null;
+
         $lastImport = $this->getLastImport();
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
             $newImport = 'use ' . $this->trait . ';' . $this->lineEnding;
 
-            array_splice($this->content, $lineNumber, 0, $this->lineEnding);
+            $startLine = $lineNumber;
+
+            if ($this->hasClassDocBlock()) {
+                /** @var array $docBlocks */
+                $docBlocks = $this->retrieveClassDocBlocks();
+
+                $startLine = $docBlocks[0]->getStartLine();
+                $endLine = $docBlocks[0]->getEndLine();
+            }
+
+            array_splice($this->content, $startLine - 1, 0, $this->lineEnding);
         } else {
             $lineNumber = $this->getLastImport()->getAttribute('endLine');
             $newImport = 'use ' . $this->trait . ';' . $this->lineEnding;
         }
 
-        array_splice($this->content, $lineNumber, 0, $newImport);
+        array_splice($this->content, $startLine - 1, 0, $newImport);
 
         return $this;
     }
@@ -250,7 +264,7 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
-        $newInterfaceExtend = substr($this->content[$line],0 , -1) . ' extends ' . $this->traitShortName . "\n";
+        $newInterfaceExtend = substr($this->content[$line], 0, -1) . ' extends ' . $this->traitShortName . "\n";
 
         $interfaceLineLength = strlen($this->content[$line]);
 
@@ -426,6 +440,21 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
+     * @return array
+     */
+    protected function retrieveClassDocBlocks()
+    {
+        $attributes = $this->classes[0]->getAttributes();
+
+        /** @var array $docBlocks */
+        $docBlocks = array_filter($attributes['comments'], function ($statement) {
+            return $statement instanceof Doc;
+        });
+
+        return $docBlocks;
+    }
+
+    /**
      * @return \PhpParser\Node\Stmt\Use_
      */
     protected function getLastImport()
@@ -442,6 +471,25 @@ class AbstractTreeHandler implements Handler
             if ($statement->uses[0]->name->toString() == $this->trait) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasClassDocBlock()
+    {
+        $attributes = $this->classes[0]->getAttributes();
+
+        if (isset($attributes['comments'])) {
+            /** @var array $docblock */
+            $docBlocks = array_filter($attributes['comments'], function ($statement) {
+                return $statement instanceof Doc;
+            });
+
+            return !empty($docBlocks);
         }
 
         return false;
