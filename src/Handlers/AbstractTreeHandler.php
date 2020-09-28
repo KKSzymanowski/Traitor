@@ -199,11 +199,11 @@ class AbstractTreeHandler implements Handler
             $startLine = $lineNumber;
 
             if ($this->hasClassDocBlock()) {
-                /** @var Doc $docBlock */
-                $docBlock = $this->retrieveClassDocBlock();
+                /** @var array $docBlocks */
+                $docBlocks = $this->retrieveClassDocBlocks();
 
-                $startLine = $docBlock[0]->getStartLine();
-                $endLine = $docBlock[0]->getEndLine();
+                $startLine = $docBlocks[0]->getStartLine();
+                $endLine = $docBlocks[0]->getEndLine();
             }
 
             array_splice($this->content, $startLine - 1, 0, $this->lineEnding);
@@ -440,6 +440,21 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
+     * @return array
+     */
+    protected function retrieveClassDocBlocks()
+    {
+        $attributes = $this->classes[0]->getAttributes();
+
+        /** @var array $docBlocks */
+        $docBlocks = array_filter($attributes['comments'], function ($statement) {
+            return $statement instanceof Doc;
+        });
+
+        return $docBlocks;
+    }
+
+    /**
      * @return \PhpParser\Node\Stmt\Use_
      */
     protected function getLastImport()
@@ -469,30 +484,15 @@ class AbstractTreeHandler implements Handler
         $attributes = $this->classes[0]->getAttributes();
 
         if (isset($attributes['comments'])) {
-            /** @var Doc $docblock */
-            $docblock = array_filter($attributes['comments'], function ($statement) {
+            /** @var array $docblock */
+            $docBlocks = array_filter($attributes['comments'], function ($statement) {
                 return $statement instanceof Doc;
             });
 
-            return !empty($docblock);
+            return !empty($docBlocks);
         }
 
         return false;
-    }
-
-    /**
-     * @return Doc
-     */
-    protected function retrieveClassDocBlock()
-    {
-        $attributes = $this->classes[0]->getAttributes();
-
-        /** @var Doc $docblock */
-        $docblock = array_filter($attributes['comments'], function ($statement) {
-            return $statement instanceof Doc;
-        });
-
-        return $docblock;
     }
 
     /**
