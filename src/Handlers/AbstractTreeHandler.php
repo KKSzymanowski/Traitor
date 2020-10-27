@@ -59,6 +59,9 @@ class AbstractTreeHandler implements Handler
     /** @var string */
     protected $lineEnding = "\n";
 
+    /** @var string */
+    protected $prefix;
+
     /**
      * @param array $content
      * @param string $trait
@@ -77,6 +80,9 @@ class AbstractTreeHandler implements Handler
         $this->class = $class;
         $classParts = explode('\\', $class);
         $this->classShortName = array_pop($classParts);
+
+        $namespace = explode('\\', $this->trait, 3);
+        $this->prefix = $namespace[0] . $namespace[1];
     }
 
     /**
@@ -194,7 +200,7 @@ class AbstractTreeHandler implements Handler
         $lastImport = $this->getLastImport();
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
-            $newImport = 'use ' . $this->trait . ';' . $this->lineEnding;
+            $newImport = 'use ' . $this->trait . ' as ' . $this->prefix . $this->traitShortName . ';' . $this->lineEnding;
 
             $startLine = $lineNumber;
 
@@ -246,7 +252,7 @@ class AbstractTreeHandler implements Handler
 
         $line = $this->getNewTraitUseLine();
 
-        $newTraitUse = static::getIndentation($this->content[$line]) . 'use ' . $this->traitShortName . ';' . $this->lineEnding;
+        $newTraitUse = static::getIndentation($this->content[$line]) . 'use ' . $this->prefix . $this->traitShortName . ';' . $this->lineEnding;
 
         array_splice($this->content, $line, 0, $newTraitUse);
 
@@ -264,7 +270,7 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
-        $newInterfaceExtend = substr($this->content[$line], 0, -1) . ' extends ' . $this->traitShortName . "\n";
+        $newInterfaceExtend = substr($this->content[$line], 0, -1) . ' extends ' . $this->prefix . $this->traitShortName . "\n";
 
         $interfaceLineLength = strlen($this->content[$line]);
 
@@ -303,7 +309,7 @@ class AbstractTreeHandler implements Handler
         foreach ($traitUses as $statement) {
             foreach ($statement->traits as $traitUse) {
                 if ($traitUse->toString() == $this->trait
-                    || $traitUse->toString() == $this->traitShortName
+                    || $traitUse->toString() == $this->prefix . $this->traitShortName
                 ) {
                     unset($this->content[$traitUse->getLine()]);
                 }
@@ -330,7 +336,7 @@ class AbstractTreeHandler implements Handler
         foreach ($extendedImports as $statement) {
             foreach ($statement->parts as $extendImport) {
                 if ($extendImport == $this->trait
-                    || $extendImport == $this->traitShortName
+                    || $extendImport == $this->prefix . $this->traitShortName
                 ) {
                     $previousExtendImport = $this->content[$statement->getLine() - 1];
 
@@ -508,7 +514,7 @@ class AbstractTreeHandler implements Handler
         foreach ($traitUses as $statement) {
             foreach ($statement->traits as $traitUse) {
                 if ($traitUse->toString() == $this->trait
-                    || $traitUse->toString() == $this->traitShortName
+                    || $traitUse->toString() == $this->prefix . $this->traitShortName
                 ) {
                     return true;
                 }
@@ -531,7 +537,7 @@ class AbstractTreeHandler implements Handler
         foreach ($extendedImports as $statement) {
             foreach ($statement->parts as $extendImport) {
                 if ($extendImport == $this->trait
-                    || $extendImport == $this->traitShortName
+                    || $extendImport == $this->prefix . $this->traitShortName
                 ) {
                     return true;
                 }
