@@ -198,6 +198,7 @@ class AbstractTreeHandler implements Handler
         $endLine = null;
 
         $lastImport = $this->getLastImport();
+
         if ($lastImport === false) {
             $lineNumber = $this->classAbstractTree->getLine() - 1;
             $newImport = 'use ' . $this->trait . ' as ' . $this->prefix . $this->traitShortName . ';' . $this->lineEnding;
@@ -215,10 +216,10 @@ class AbstractTreeHandler implements Handler
             array_splice($this->content, $startLine - 1, 0, $this->lineEnding);
         } else {
             $lineNumber = $this->getLastImport()->getAttribute('endLine');
-            $newImport = 'use ' . $this->trait . ';' . $this->lineEnding;
+            $newImport = 'use ' . $this->trait . ' as ' . $this->prefix . $this->traitShortName . ';' . $this->lineEnding;
         }
 
-        array_splice($this->content, $startLine - 1, 0, $newImport);
+        array_splice($this->content, $lineNumber, 0, $newImport);
 
         return $this;
     }
@@ -277,7 +278,7 @@ class AbstractTreeHandler implements Handler
         $newCommaSeparator = substr_replace($this->content[$line], ',', $interfaceLineLength - 1, 0);
 
         if (false !== strpos($this->content[$line], 'extends')) {
-            $newInterfaceExtend = $this->traitShortName . "\n";
+            $newInterfaceExtend = $this->prefix . $this->traitShortName . "\n";
 
             array_splice($this->content, $line, 0, $newCommaSeparator);
             array_splice($this->content, $line + 1, 0, $newInterfaceExtend);
