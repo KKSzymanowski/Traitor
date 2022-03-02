@@ -12,9 +12,9 @@
 
 namespace Traitor;
 
+use BadMethodCallException;
 use ReflectionClass;
 use RuntimeException;
-use BadMethodCallException;
 use Traitor\Handlers\AbstractTreeHandler;
 
 class TraitUseAdder
@@ -23,8 +23,7 @@ class TraitUseAdder
     protected $traitReflections = [];
 
     /**
-     * @param string $trait
-     *
+     * @param  string  $trait
      * @return static
      */
     public function addTrait($trait)
@@ -33,8 +32,7 @@ class TraitUseAdder
     }
 
     /**
-     * @param array $traits
-     *
+     * @param  array  $traits
      * @return static
      */
     public function addTraits(array $traits)
@@ -47,12 +45,11 @@ class TraitUseAdder
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
+     * @return $this
      *
      * @throws BadMethodCallException
      * @throws RuntimeException
-     *
-     * @return $this
      */
     public function toClass($class)
     {

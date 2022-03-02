@@ -15,8 +15,7 @@ namespace Traitor;
 class Traitor
 {
     /**
-     * @param string $trait
-     *
+     * @param  string  $trait
      * @return TraitUseAdder
      */
     public static function addTrait($trait)
@@ -27,8 +26,7 @@ class Traitor
     }
 
     /**
-     * @param array $traits
-     *
+     * @param  array  $traits
      * @return TraitUseAdder
      */
     public static function addTraits($traits)
@@ -41,8 +39,8 @@ class Traitor
     /**
      * Check if provided class uses a specific trait.
      *
-     * @param string $className
-     * @param string $traitName
+     * @param  string  $className
+     * @param  string  $traitName
      * @return bool
      */
     public static function alreadyUses($className, $traitName)

@@ -15,10 +15,10 @@ namespace Traitor\Handlers;
 use Exception;
 use PhpParser\Error;
 use PhpParser\Lexer;
-use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Stmt\Use_;
 
 class AbstractTreeHandler implements Handler
 {
@@ -56,9 +56,9 @@ class AbstractTreeHandler implements Handler
     protected $lineEnding = "\n";
 
     /**
-     * @param array  $content
-     * @param string $trait
-     * @param string $class
+     * @param  array  $content
+     * @param  string  $trait
+     * @param  string  $class
      */
     public function __construct($content, $trait, $class)
     {
@@ -105,9 +105,9 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @throws Exception
-     *
      * @return $this
+     *
+     * @throws Exception
      */
     protected function buildSyntaxTree()
     {
@@ -164,9 +164,9 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @throws Exception
-     *
      * @return $this
+     *
+     * @throws Exception
      */
     protected function parseContent()
     {
@@ -183,9 +183,9 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @throws Exception
-     *
      * @return $this
+     *
+     * @throws Exception
      */
     protected function retrieveNamespace()
     {
@@ -268,9 +268,9 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @throws Exception
-     *
      * @return $this
+     *
+     * @throws Exception
      */
     protected function findClassDefinition()
     {
@@ -287,6 +287,7 @@ class AbstractTreeHandler implements Handler
 
     /**
      * @return int
+     *
      * @throws Exception
      */
     protected function getNewTraitUseLine()
@@ -329,7 +330,6 @@ class AbstractTreeHandler implements Handler
 
     /**
      * @param $line
-     *
      * @return string
      */
     protected static function getIndentation($line)
