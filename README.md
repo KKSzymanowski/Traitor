@@ -68,12 +68,3 @@ class Foo
     use PreviouslyExistingTrait;
 }
 ```
-
-## To do
-- Add trait correctly when the class is empty, for example:
-```
-class Foo {}
-```
-
-- Add trait correctly when the class isn't namespaced.
-
