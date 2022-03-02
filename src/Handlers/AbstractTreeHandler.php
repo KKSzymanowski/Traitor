@@ -154,6 +154,8 @@ class AbstractTreeHandler implements Handler
             return $this;
         }
 
+        $this->openBracketsIfNecessary();
+
         $line = $this->getNewTraitUseLine();
 
         $newTraitUse = static::getIndentation($this->content[$line]).'use '.$this->traitShortName.';'.$this->lineEnding;
@@ -189,11 +191,19 @@ class AbstractTreeHandler implements Handler
      */
     protected function retrieveNamespace()
     {
-        if (! isset($this->syntaxTree[0]) || ! ($this->syntaxTree[0] instanceof Namespace_)) {
-            throw new Exception("Could not locate namespace definition for class '".$this->classShortName."'");
+        $namespaceNode = null;
+        foreach ($this->syntaxTree as $item) {
+            if ($item instanceof Namespace_) {
+                $namespaceNode = $item;
+            }
         }
 
-        $this->namespace = $this->syntaxTree[0];
+        if (! $namespaceNode) {
+//            var_dump($this->syntaxTree);die;
+//            throw new Exception("Could not locate namespace definition for class '".$this->classShortName."'");
+        }
+
+        $this->namespace = $namespaceNode;
 
         return $this;
     }
@@ -203,9 +213,15 @@ class AbstractTreeHandler implements Handler
      */
     protected function retrieveImports()
     {
-        $this->importStatements = array_filter($this->namespace->stmts, function ($statement) {
-            return $statement instanceof Use_;
-        });
+        if ($this->namespace === null) {
+            $this->importStatements = array_filter($this->syntaxTree, function ($statement) {
+                return $statement instanceof Use_;
+            });
+        } else {
+            $this->importStatements = array_filter($this->namespace->stmts, function ($statement) {
+                return $statement instanceof Use_;
+            });
+        }
 
         return $this;
     }
@@ -215,9 +231,15 @@ class AbstractTreeHandler implements Handler
      */
     protected function retrieveClasses()
     {
-        $this->classes = array_filter($this->namespace->stmts, function ($statement) {
-            return $statement instanceof Class_;
-        });
+        if ($this->namespace === null) {
+            $this->classes = array_filter($this->syntaxTree, function ($statement) {
+                return $statement instanceof Class_;
+            });
+        } else {
+            $this->classes = array_filter($this->namespace->stmts, function ($statement) {
+                return $statement instanceof Class_;
+            });
+        }
 
         return $this;
     }
@@ -311,6 +333,28 @@ class AbstractTreeHandler implements Handler
         throw new Exception("Opening bracket not found in class [$this->classShortName]");
     }
 
+    protected function openBracketsIfNecessary()
+    {
+        for ($line = $this->classAbstractTree->getLine() - 1; $line < count($this->content); $line++) {
+            $trimmedLine = rtrim($this->content[$line]);
+
+            if (substr($trimmedLine, strlen($trimmedLine) - 2) == '{}') {
+                $trimmedLine = rtrim(substr($trimmedLine, 0, strlen($trimmedLine) - 2));
+                if (strlen($trimmedLine) == 0) {
+                    $this->content[$line] = '{'.$this->lineEnding;
+                    array_splice($this->content, $line + 1, 0, '}'.$this->lineEnding);
+                } else {
+                    $this->content[$line] = $trimmedLine.$this->lineEnding;
+                    array_splice($this->content, $line + 1, 0, '{'.$this->lineEnding);
+                    array_splice($this->content, $line + 2, 0, '}'.$this->lineEnding);
+                }
+
+                $this->buildSyntaxTree();
+                break;
+            }
+        }
+    }
+
     /**
      * Default line ending is set to LF.
      *
@@ -344,7 +388,7 @@ class AbstractTreeHandler implements Handler
             }
         }
 
-        return '    ';
+        return str_repeat(' ', 4);
     }
 
     protected function getParser()

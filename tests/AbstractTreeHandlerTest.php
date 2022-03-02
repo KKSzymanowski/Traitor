@@ -5,7 +5,7 @@ use Traitor\Handlers\AbstractTreeHandler;
 class AbstractTreeHandlerTest extends TestCase
 {
     /**
-     * @dataProvider testCaseDataProvider
+     * @dataProvider dataProvider
      * @param string $pathOriginal
      * @param string $content
      */
@@ -31,7 +31,8 @@ class AbstractTreeHandlerTest extends TestCase
 
     public function test_exception_is_thrown_when_class_is_not_found()
     {
-        $this->setExpectedException('Exception', 'Class Bar not found');
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Class Bar not found');
 
         $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
 
@@ -42,10 +43,8 @@ class AbstractTreeHandlerTest extends TestCase
 
     public function test_exception_is_thrown_on_parsing_error()
     {
-        $this->setExpectedException(
-            'Exception',
-            "Error on parsing Bar class"
-        );
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Error on parsing Bar class');
 
         $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
 
@@ -54,21 +53,7 @@ class AbstractTreeHandlerTest extends TestCase
         $handler->handle();
     }
 
-    public function test_exception_is_thrown_when_no_namespace_is_found()
-    {
-        $this->setExpectedException(
-            'Exception',
-            "Could not locate namespace definition for class 'Bar'"
-        );
-
-        $pathOriginal = __DIR__ . '/Other/' . __FUNCTION__;
-
-        $handler = new AbstractTreeHandler(file($pathOriginal), 'Baz\FooTrait', 'Foo\Bar');
-
-        $handler->handle();
-    }
-
-    public function testCaseDataProvider()
+    public function dataProvider()
     {
         $files = new FilesystemIterator(__DIR__ . '/OriginalFiles', FilesystemIterator::SKIP_DOTS);
 
