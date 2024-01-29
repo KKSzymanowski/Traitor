@@ -401,9 +401,9 @@ class AbstractTreeHandler implements Handler
         } else {
             $parserFactory = new \PhpParser\ParserFactory();
 
-            if(method_exists($parserFactory, 'createForHostVersion')) {
+            if (method_exists($parserFactory, 'createForHostVersion')) {
                 return $parserFactory->createForHostVersion();
-            } elseif(method_exists($parserFactory, 'create')) {
+            } elseif (method_exists($parserFactory, 'create')) {
                 return $parserFactory->create(\PhpParser\ParserFactory::PREFER_PHP7);
             } else {
                 throw new \RuntimeException('Unsupported version of nikic/php-parser');
