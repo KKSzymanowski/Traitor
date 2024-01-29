@@ -373,7 +373,7 @@ class AbstractTreeHandler implements Handler
     }
 
     /**
-     * @param $line
+     * @param  $line
      * @return string
      */
     protected static function getIndentation($line)
