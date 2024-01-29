@@ -399,8 +399,15 @@ class AbstractTreeHandler implements Handler
             // If we are running nikic/php-parser 1.*
             return new \PhpParser\Parser(new Lexer());
         } else {
-            // If we are running nikic/php-parser 2.*, 3.* or 4.*
-            return (new \PhpParser\ParserFactory)->create(\PhpParser\ParserFactory::PREFER_PHP7);
+            $parserFactory = new \PhpParser\ParserFactory();
+
+            if(method_exists($parserFactory, 'createForHostVersion')) {
+                return $parserFactory->createForHostVersion();
+            } elseif(method_exists($parserFactory, 'create')) {
+                return $parserFactory->create(\PhpParser\ParserFactory::PREFER_PHP7);
+            } else {
+                throw new \RuntimeException('Unsupported version of nikic/php-parser');
+            }
         }
     }
 }

@@ -51,9 +51,9 @@ class TraitUseAdderTest extends TestCase
 
         $this->expectException(ReflectionException::class);
         if(version_compare(PHP_VERSION, '8.0.0') >= 0) {
-            $this->expectExceptionMessage("Class \"${className}\" does not exist");
+            $this->expectExceptionMessage("Class \"{$className}\" does not exist");
         } else {
-            $this->expectExceptionMessage("Class ${className} does not exist");
+            $this->expectExceptionMessage("Class {$className} does not exist");
         }
 
         $this->includeFile('Trait1.php');
@@ -67,9 +67,9 @@ class TraitUseAdderTest extends TestCase
 
         $this->expectException(ReflectionException::class);
         if(version_compare(PHP_VERSION, '8.0.0') >= 0) {
-            $this->expectExceptionMessage("Class \"${traitName}\" does not exist");
+            $this->expectExceptionMessage("Class \"{$traitName}\" does not exist");
         } else {
-            $this->expectExceptionMessage("Class ${traitName} does not exist");
+            $this->expectExceptionMessage("Class {$traitName} does not exist");
         }
 
         $this->includeFile('BarClass.php');
